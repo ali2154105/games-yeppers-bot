@@ -47,28 +47,56 @@ client.on('interactionCreate', async (interaction) => {
   const member = interaction.member;
   const selected = interaction.values;
 
+  const allGameRoles = ['COD', 'Among Us', 'PUBG', 'Minecraft', 'Overwatch', 'Marvel Rivals', 'Code Names', 'UNO'];
   const added = [];
   const removed = [];
+  const errors = [];
 
-  for (const roleName of selected) {
-    const role = interaction.guild.roles.cache.find(r => r.name.toLowerCase() === roleName.toLowerCase());
-    if (!role) continue;
+  try {
+    for (const roleName of selected) {
+      const role = interaction.guild.roles.cache.find(r => r.name.toLowerCase() === roleName.toLowerCase());
+      if (!role) {
+        errors.push(roleName);
+        continue;
+      }
 
-    if (member.roles.cache.has(role.id)) {
-      await member.roles.remove(role);
-      removed.push(role.name);
-    } else {
-      await member.roles.add(role);
-      added.push(role.name);
+      if (!member.roles.cache.has(role.id)) {
+        try {
+          await member.roles.add(role);
+          added.push(role.name);
+        } catch (error) {
+          errors.push(roleName);
+          console.error(`Failed to add role ${roleName}:`, error);
+        }
+      }
     }
+
+    for (const roleName of allGameRoles) {
+      if (!selected.includes(roleName)) {
+        const role = interaction.guild.roles.cache.find(r => r.name.toLowerCase() === roleName.toLowerCase());
+        if (role && member.roles.cache.has(role.id)) {
+          try {
+            await member.roles.remove(role);
+            removed.push(role.name);
+          } catch (error) {
+            errors.push(roleName);
+            console.error(`Failed to remove role ${roleName}:`, error);
+          }
+        }
+      }
+    }
+
+    let reply = '';
+    if (added.length) reply += `✅ أُضيفت: ${added.join(', ')}\n`;
+    if (removed.length) reply += `🗑 أُزيلت: ${removed.join(', ')}\n`;
+    if (errors.length) reply += `⚠️ خطأ في: ${errors.join(', ')}\n`;
+    if (!reply) reply = '🤷 ما صار أي تغيير';
+
+    await interaction.reply({ content: reply.trim(), ephemeral: true });
+  } catch (error) {
+    console.error('Error handling interaction:', error);
+    await interaction.reply({ content: '❌ حدث خطأ أثناء تحديث الأدوار', ephemeral: true }).catch(() => {});
   }
-
-  let reply = '';
-  if (added.length) reply += `✅ أُضيفت: ${added.join(', ')}\n`;
-  if (removed.length) reply += `🗑 أُزيلت: ${removed.join(', ')}`;
-  if (!reply) reply = '🤷 ما صار أي تغيير';
-
-  await interaction.reply({ content: reply, ephemeral: true });
 });
 
 client.login(process.env.TOKEN);
