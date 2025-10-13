@@ -11,7 +11,8 @@ A Discord bot that manages game-related role assignments through an interactive 
 ## Features
 - Interactive select menu with 8 popular games
 - Automatic role assignment/removal based on selections
-- Toggle functionality (selecting a game adds role if not present, removes if already assigned)
+- Selection represents desired final state (roles are added/removed to match selection)
+- Comprehensive error handling for Discord API failures
 - Arabic language support for UI messages
 - Ephemeral responses showing role changes
 - Game-specific emojis for visual identification
@@ -83,9 +84,11 @@ A Discord bot that manages game-related role assignments through an interactive 
 - `TOKEN`: Discord bot token (stored in Replit Secrets)
 
 ## Recent Changes
-- **October 13, 2025**: Initial project setup
+- **October 13, 2025**: Initial project setup and bug fixes
   - Installed Node.js 20 and discord.js
   - Created bot with game role management functionality
+  - Fixed critical bug: Changed role logic from toggle to desired-state (selection now represents final roles user wants)
+  - Added comprehensive error handling for Discord API operations
   - Configured workflow to run bot automatically
   - Added Arabic language support for messages
   - Successfully deployed and tested bot connection
