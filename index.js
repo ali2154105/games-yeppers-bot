@@ -22,7 +22,7 @@ client.on('messageCreate', async (message) => {
       .setPlaceholder('اختر ألعابك المفضلة 🎮')
       .setMinValues(1)
       .setMaxValues(8)
-      .setImage( https://as2.ftcdn.net/v2/jpg/04/42/21/53/1000_F_442215355_AjiR6ogucq3vPzjFAAEfwbPXYGqYVAap.jpg )
+      .setImage(https://as2.ftcdn.net/v2/jpg/04/42/21/53/1000_F_442215355_AjiR6ogucq3vPzjFAAEfwbPXYGqYVAap.jpg)
       .addOptions([
         { label: 'COD', value: 'COD', emoji: '🪖' },
         { label: 'Among Us', value: 'Among Us', emoji: '👽' },
