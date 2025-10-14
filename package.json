@@ -1,17 +1,21 @@
 {
-  "name": "workspace",
+  "name": "discord-game-roles-bot",
   "version": "1.0.0",
+  "description": "Discord bot that gives game roles",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "discord",
+    "bot",
+    "games",
+    "roles"
+  ],
+  "author": "Ali",
+  "license": "MIT",
   "dependencies": {
     "discord.js": "^14.23.2",
-    "dotenv": "^17.2.3",
     "express": "^5.1.0"
   }
 }
