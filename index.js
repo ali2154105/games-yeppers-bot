@@ -22,6 +22,7 @@ client.on('messageCreate', async (message) => {
       .setPlaceholder('اختر ألعابك المفضلة 🎮')
       .setMinValues(1)
       .setMaxValues(8)
+      .setImage(https://stock.adobe.com/jo/search?k=game&asset_id=442215355)
       .addOptions([
         { label: 'COD', value: 'COD', emoji: '🪖' },
         { label: 'Among Us', value: 'Among Us', emoji: '👽' },
