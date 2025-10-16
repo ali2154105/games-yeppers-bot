@@ -1,4 +1,6 @@
 const { Client, GatewayIntentBits, ActionRowBuilder, StringSelectMenuBuilder, Partials } = require('discord.js');
+const express = require('express');
+const app = express();
 
 const client = new Client({
   intents: [
@@ -19,35 +21,56 @@ client.on('messageCreate', async (message) => {
   if (message.content === '!setup-games') {
     const menu = new StringSelectMenuBuilder()
       .setCustomId('gameSelect')
-      .setPlaceholder('اختر ألعابك المفضلة 🎮')
+      .setPlaceholder('🎮 اختر ألعابك المفضلة')
       .setMinValues(1)
-      .setMaxValues(8)
+      .setMaxValues(10)
       .addOptions([
+        { label: 'Fortnite', value: 'Fortnite', emoji: '🔫' },
         { label: 'COD', value: 'COD', emoji: '🪖' },
-        { label: 'Among Us', value: 'Among Us', emoji: '👽' },
+        { label: 'Valorant', value: 'Valorant', emoji: '🎯' },
         { label: 'PUBG', value: 'PUBG', emoji: '💣' },
-        { label: 'Minecraft', value: 'Minecraft', emoji: '⛏' },
-        { label: 'Overwatch', value: 'Overwatch', emoji: '🛡' },
+        { label: 'GTA Online', value: 'GTA Online', emoji: '🚗' },
+        { label: 'Minecraft', value: 'Minecraft', emoji: '⛏️' },
+        { label: 'League of Legends', value: 'League of Legends', emoji: '👑' },
+        { label: 'Dota 2', value: 'Dota 2', emoji: '🧙' },
+        { label: 'Rocket League', value: 'Rocket League', emoji: '🚀' },
+        { label: 'Overwatch', value: 'Overwatch', emoji: '🛡️' },
+        { label: 'Among Us', value: 'Among Us', emoji: '👽' },
         { label: 'Marvel Rivals', value: 'Marvel Rivals', emoji: '🦸' },
-        { label: 'Code Names', value: 'Code Names', emoji: '🕵' },
-        { label: 'UNO', value: 'UNO', emoji: '🎴' },
+        { label: 'Brawlhalla', value: 'Brawlhalla', emoji: '🥊' },
       ]);
 
     const row = new ActionRowBuilder().addComponents(menu);
 
-    await message.channel.send({ content: '🎯 اختر ألعابك من القائمة أدناه:', components: [row] });
+    await message.channel.send({
+      content: '🎯 اختر ألعابك من القائمة أدناه:',
+      components: [row]
+    });
   }
 });
 
 // ======== التعامل مع الاختيارات ==========
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isStringSelectMenu()) return;
-  if (interaction.customId !== 'gameSelect') return;
+  if (!interaction.isStringSelectMenu() || interaction.customId !== 'gameSelect') return;
 
   const member = interaction.member;
   const selected = interaction.values;
+  const allGameRoles = [
+    'Fortnite',
+    'COD',
+    'Valorant',
+    'PUBG',
+    'GTA Online',
+    'Minecraft',
+    'League of Legends',
+    'Dota 2',
+    'Rocket League',
+    'Overwatch',
+    'Among Us',
+    'Marvel Rivals',
+    'Brawlhalla'
+  ];
 
-  const allGameRoles = ['COD', 'Among Us', 'PUBG', 'Minecraft', 'Overwatch', 'Marvel Rivals', 'Code Names', 'UNO'];
   const added = [];
   const removed = [];
   const errors = [];
@@ -59,15 +82,9 @@ client.on('interactionCreate', async (interaction) => {
         errors.push(roleName);
         continue;
       }
-
       if (!member.roles.cache.has(role.id)) {
-        try {
-          await member.roles.add(role);
-          added.push(role.name);
-        } catch (error) {
-          errors.push(roleName);
-          console.error(`Failed to add role ${roleName}:`, error);
-        }
+        await member.roles.add(role);
+        added.push(role.name);
       }
     }
 
@@ -75,13 +92,8 @@ client.on('interactionCreate', async (interaction) => {
       if (!selected.includes(roleName)) {
         const role = interaction.guild.roles.cache.find(r => r.name.toLowerCase() === roleName.toLowerCase());
         if (role && member.roles.cache.has(role.id)) {
-          try {
-            await member.roles.remove(role);
-            removed.push(role.name);
-          } catch (error) {
-            errors.push(roleName);
-            console.error(`Failed to remove role ${roleName}:`, error);
-          }
+          await member.roles.remove(role);
+          removed.push(role.name);
         }
       }
     }
@@ -89,10 +101,10 @@ client.on('interactionCreate', async (interaction) => {
     let reply = '';
     if (added.length) reply += `✅ أُضيفت: ${added.join(', ')}\n`;
     if (removed.length) reply += `🗑 أُزيلت: ${removed.join(', ')}\n`;
-    if (errors.length) reply += `⚠️ خطأ في: ${errors.join(', ')}\n`;
-    if (!reply) reply = '🤷 ما صار أي تغيير';
+    if (errors.length) reply += `⚠️ لم أجد الرتب: ${errors.join(', ')}\n`;
+    if (!reply) reply = '🤷‍♂️ ما صار أي تغيير';
 
-    await interaction.reply({ content: reply.trim(), ephemeral: true });
+    await interaction.reply({ content: reply, ephemeral: true });
   } catch (error) {
     console.error('Error handling interaction:', error);
     await interaction.reply({ content: '❌ حدث خطأ أثناء تحديث الأدوار', ephemeral: true }).catch(() => {});
@@ -100,13 +112,7 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.login(process.env.TOKEN);
-const express = require('express');
-const app = express();
 
-app.get('/', (req, res) => {
-  res.send('Bot is running!');
-});
+app.get('/', (req, res) => res.send('Bot is running!'));
+app.listen(3000, () => console.log('🌐 Web server is live'));
 
-app.listen(3000, () => {
-  console.log('🌐 Web server is live');
-});
