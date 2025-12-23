@@ -49,6 +49,40 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+// ======== أمر إعطاء رتبة بالـ ID (إضافة جديدة) ==========
+client.on('messageCreate', async (message) => {
+  if (!message.content.startsWith('!give-role')) return;
+  if (!message.guild) return;
+
+  if (!message.member.permissions.has('ManageRoles')) {
+    return message.reply('❌ ما عندك صلاحية تعطي رتب');
+  }
+
+  const args = message.content.split(' ');
+  const roleId = args[1];
+
+  if (!roleId) {
+    return message.reply('⚠️ استخدم الأمر هكذا:\n`!give-role ROLE_ID`');
+  }
+
+  const role = message.guild.roles.cache.get(roleId);
+  if (!role) {
+    return message.reply('❌ ما لقيت رتبة بهذا الـ ID');
+  }
+
+  try {
+    if (message.member.roles.cache.has(role.id)) {
+      return message.reply('🤷‍♂️ أنت أصلاً معك هذه الرتبة');
+    }
+
+    await message.member.roles.add(role);
+    message.reply(`✅ تم إعطاؤك رتبة **${role.name}**`);
+  } catch (error) {
+    console.error(error);
+    message.reply('❌ فشل إعطاء الرتبة (تأكد من صلاحيات البوت)');
+  }
+});
+
 // ======== التعامل مع الاختيارات ==========
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isStringSelectMenu() || interaction.customId !== 'gameSelect') return;
@@ -77,7 +111,9 @@ client.on('interactionCreate', async (interaction) => {
 
   try {
     for (const roleName of selected) {
-      const role = interaction.guild.roles.cache.find(r => r.name.toLowerCase() === roleName.toLowerCase());
+      const role = interaction.guild.roles.cache.find(
+        r => r.name.toLowerCase() === roleName.toLowerCase()
+      );
       if (!role) {
         errors.push(roleName);
         continue;
@@ -90,7 +126,9 @@ client.on('interactionCreate', async (interaction) => {
 
     for (const roleName of allGameRoles) {
       if (!selected.includes(roleName)) {
-        const role = interaction.guild.roles.cache.find(r => r.name.toLowerCase() === roleName.toLowerCase());
+        const role = interaction.guild.roles.cache.find(
+          r => r.name.toLowerCase() === roleName.toLowerCase()
+        );
         if (role && member.roles.cache.has(role.id)) {
           await member.roles.remove(role);
           removed.push(role.name);
@@ -107,7 +145,10 @@ client.on('interactionCreate', async (interaction) => {
     await interaction.reply({ content: reply, ephemeral: true });
   } catch (error) {
     console.error('Error handling interaction:', error);
-    await interaction.reply({ content: '❌ حدث خطأ أثناء تحديث الأدوار', ephemeral: true }).catch(() => {});
+    await interaction.reply({
+      content: '❌ حدث خطأ أثناء تحديث الأدوار',
+      ephemeral: true
+    }).catch(() => {});
   }
 });
 
