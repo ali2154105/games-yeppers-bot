@@ -10,6 +10,7 @@ const {
 
 const TOKEN = process.env.DISCORD_TOKEN || process.env.TOKEN;
 const GUILD_ID = process.env.GUILD_ID;
+const ALLOWED_USER_ID = '809903116865634344';
 
 if (!TOKEN) {
   throw new Error('Missing DISCORD_TOKEN (or TOKEN) environment variable.');
@@ -66,6 +67,14 @@ client.once('ready', async () => {
 
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isChatInputCommand() || interaction.commandName !== 'send') return;
+
+  if (interaction.user.id !== ALLOWED_USER_ID) {
+    await interaction.reply({
+      content: '❌ هذا الأمر مسموح فقط لمستخدم محدد.',
+      ephemeral: true,
+    });
+    return;
+  }
 
   const channel = interaction.options.getChannel('channel', true);
   const user = interaction.options.getUser('user', true);
