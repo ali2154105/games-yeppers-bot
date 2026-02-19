@@ -1,25 +1,39 @@
-# Discord `/send` Bot (discord.js v14)
+# Discord Bot (discord.js v14)
 
-This bot provides one slash command:
+This bot includes two slash commands:
 
 - `/send channel:<channel> user:<user> message:<text>`
+- `/tictactoe opponent:<user>`
 
-When run, it sends:
+## 1) `/send`
+Sends this format into the selected text channel:
 
 ```text
 <@USER_ID> MESSAGE_CONTENT
 ```
 
-in the selected channel.
-
-## Features
-
+### Behavior
 - Uses `SlashCommandBuilder`.
-- `channel` option is restricted to **Guild text channels**.
-- Validates channel is text-based before sending.
+- `channel` option is restricted to guild text channels.
+- Validates channel is text-based.
 - Checks bot permissions (`ViewChannel`, `SendMessages`).
-- Handles permission failures with clear ephemeral error responses.
-- Uses environment variables for token and optional guild-scoped command registration.
+- Returns ephemeral success/failure responses.
+
+## 2) `/tictactoe`
+Starts an interactive Tic-Tac-Toe (XO) game between command user and chosen opponent.
+
+### Game flow
+- Bot posts a 3x3 clickable board.
+- Board is updated after each move.
+- Turn order is enforced (X then O).
+- Only the two players can click the board.
+- Invalid actions are handled gracefully:
+  - out-of-turn move
+  - clicking occupied cell
+  - non-player interaction
+- Announces result when game ends:
+  - winner
+  - tie
 
 ## Required environment variables
 
@@ -27,12 +41,11 @@ in the selected channel.
 DISCORD_TOKEN=your_bot_token
 # Optional fallback name
 TOKEN=your_bot_token
-# Optional (recommended during development): guild command scope for instant updates
+# Optional (recommended during development)
 GUILD_ID=your_guild_id
 ```
 
 ## Required intents
-
 - `Guilds`
 
 ## Setup and run
@@ -43,6 +56,5 @@ npm start
 ```
 
 ## Notes
-
-- If `GUILD_ID` is provided, `/send` is registered in that guild only (faster updates).
-- Without `GUILD_ID`, `/send` is registered globally (can take time to appear).
+- If `GUILD_ID` is set, commands are registered only in that guild (faster updates).
+- Without `GUILD_ID`, commands are global and may take time to appear.
