@@ -1,1 +1,1 @@
-Deprecated: project docs moved to README.md.
+Project documentation moved to `README.md`.

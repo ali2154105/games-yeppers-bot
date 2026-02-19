@@ -1,86 +1,48 @@
-# Games Yeppers Bot
+# Discord `/send` Bot (discord.js v14)
 
-A Discord bot (discord.js v14) with slash commands:
+This bot provides one slash command:
 
-- `/firstmessage user:<User>`
-- `/firstmessage_cancel`
-- `/userinfo user:<User>`
+- `/send channel:<channel> user:<user> message:<text>`
+
+When run, it sends:
+
+```text
+<@USER_ID> MESSAGE_CONTENT
+```
+
+in the selected channel.
 
 ## Features
 
-### `/firstmessage`
-Best-effort search for the oldest accessible message sent by a target user.
+- Uses `SlashCommandBuilder`.
+- `channel` option is restricted to **Guild text channels**.
+- Validates channel is text-based before sending.
+- Checks bot permissions (`ViewChannel`, `SendMessages`).
+- Handles permission failures with clear ephemeral error responses.
+- Uses environment variables for token and optional guild-scoped command registration.
 
-- Enumerates all accessible text channels where bot has `ViewChannel` + `ReadMessageHistory`.
-- Includes threads (active + archived when accessible).
-- Uses bounded search with snowflake timestamps (`dateToSnowflake`) and binary narrowing.
-- Probes message windows with small batches (`limit: 100`) and page caps.
-- Maintains a global oldest candidate across channels.
-- Caches findings in SQLite by `(guild_id, user_id, channel_id)` with:
-  - `earliest_found_message_id`
-  - `last_scanned_at`
-- Limits concurrency to 3 channels at a time.
-- Applies basic rate-limit backoff.
-- Sends ephemeral progress updates while scanning.
-- Supports cancellation via `/firstmessage_cancel`.
-
-### `/userinfo`
-Returns an embed containing:
-
-- user id
-- account creation timestamp
-- server join timestamp
-- roles
-
-## Project structure
-
-```text
-.
-├── index.js        # Main bot implementation
-├── package.json    # Scripts and dependencies
-├── README.md       # Setup and usage
-└── data.sqlite     # Auto-created cache database on first run
-```
-
-## Environment variables
-
-Create a `.env` or set environment variables in your host:
+## Required environment variables
 
 ```env
 DISCORD_TOKEN=your_bot_token
-# Optional fallback name supported by the bot
+# Optional fallback name
 TOKEN=your_bot_token
-# Optional: register guild-scoped commands for instant updates
+# Optional (recommended during development): guild command scope for instant updates
 GUILD_ID=your_guild_id
-# Optional: sqlite path
-SQLITE_PATH=./data.sqlite
-# Optional: web port
-PORT=3000
 ```
 
-## Run
+## Required intents
+
+- `Guilds`
+
+## Setup and run
 
 ```bash
 npm install
 npm start
 ```
 
-## Bot permissions / intents
-
-### Required gateway intents
-- Guilds
-- GuildMembers
-- GuildMessages
-- MessageContent
-
-### Required permissions in guild
-- View Channels
-- Read Message History
-- Send Messages
-- Embed Links
-
 ## Notes
 
-- `/firstmessage` result is labeled as **oldest accessible message found** by design.
-- Hidden/inaccessible channels and unavailable archived threads are skipped.
-- This is intentionally best-effort and rate-limit conscious (bounded probing, capped pages, limited concurrency).
+- If `GUILD_ID` is provided, `/send` is registered in that guild only (faster updates).
+- Without `GUILD_ID`, `/send` is registered globally (can take time to appear).
