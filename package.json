@@ -1,16 +1,14 @@
 {
   "name": "discord-game-roles-bot",
   "version": "1.0.0",
-  "description": "Discord bot that gives game roles",
+  "description": "Discord bot that finds oldest accessible user messages",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "keywords": [
     "discord",
-    "bot",
-    "games",
-    "roles"
+    "bot"
   ],
   "author": "Ali",
   "license": "MIT",
